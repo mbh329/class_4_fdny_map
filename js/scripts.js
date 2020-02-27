@@ -3,8 +3,8 @@
 mapboxgl.accessToken = 'pk.eyJ1IjoibWJoMzI5IiwiYSI6ImNrNnUyejFycTA1bzAzbXBtb205cW53NmUifQ.9yI7-YS_XsPUNaTKblgY8w';
 // we want to return to this point and zoom level after the user interacts
 // with the map, so store them in variables
-var initialCenterPoint = [-73.991780, 40.676]
-var initialZoom = 13
+var initialCenterPoint = [-73.99114, 40.73738]
+var initialZoom = 10.06
 // helper function to look up borough
 var BoroughLookup = (Borough) => {
   switch (Borough) {
@@ -61,34 +61,59 @@ map.on('style.load', function() {
   // add a layer for our custom source
   map.addLayer({
     id: 'point_fdny_stations',
-    type: 'Point',
+    type: 'circle',
     source: 'fdny_stations',
     paint: {
-      'point-color': {
-        type: 'point',
-        property: 'coordinates',
-        stops: [
-          'Manhattan',
-          BoroughLookup(Manhattan).color,
-        ],
-        [
-          'Brooklyn',
-          BoroughLookup(Brooklyn).color,
-        ],
-        [
-          'Queens',
-          BoroughLookup(Queens).color,
-        ],
-        [
-          'Bronx',
-          BoroughLookup(Bronx).color,
-        ],
-        [
-          'StatenIsland',
-          BoroughLookup(StatenIsland).color,
-        ],
+// make circles larger as the user zooms from z12 to z22
 
-      ]
-      }
-    }
+'circle-color': [
+  'match',
+['get', 'Borough'],
+ 'Manhattan',
+ '#f4f455',
+ 'Bronx',
+ '#5CA2D1',
+ 'Brooklyn',
+ '#FF9900',
+ 'Queens',
+ '#ea6661',
+ 'StatenIsland',
+ '#8ece7c',
+ /* other */ '#ccc'
+]
+
+}
+});
+});
+
+//code above works - don't mess with it
+// add an empty data source, which we will use to highlight the station the user is hovering over
+map.addSource('highlight_fdny_stations', {
+  type: 'geojson',
+  data: {
+    type: 'FeatureCollection',
+    features: []
+  }
+})
+
+// add a layer for the highlighted station
+map.addLayer({
+  id: 'highlight-circle',
+  type: 'circle',
+  source: 'highlight_fdny_stations',
+  paint: {
+    'circle-radius': 5,
+    'circle-opacity': 1,
+    'circle-color': 'black',
+  }
+});
+
+map.on('mousemove', function (e) {
+   // query for the features under the mouse, but only in the lots layer
+   var features = map.queryRenderedFeatures(e.point, {
+       layers: ['highlight_fdny_stations'],
+   });
+
+   // if the mouse pointer is over a feature on our layer of interest
+   // take the data for that feature and display it in the sidebar
 })
