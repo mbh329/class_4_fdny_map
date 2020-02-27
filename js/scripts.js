@@ -66,8 +66,29 @@ map.on('style.load', function() {
     paint: {
       'point-color': {
         type: 'point',
-        property: 'coordinates'
+        property: 'coordinates',
+        stops: [
+          'Manhattan',
+          BoroughLookup(Manhattan).color,
+        ],
+        [
+          'Brooklyn',
+          BoroughLookup(Brooklyn).color,
+        ],
+        [
+          'Queens',
+          BoroughLookup(Queens).color,
+        ],
+        [
+          'Bronx',
+          BoroughLookup(Bronx).color,
+        ],
+        [
+          'StatenIsland',
+          BoroughLookup(StatenIsland).color,
+        ],
+
+      ]
       }
     }
-  });
 })
