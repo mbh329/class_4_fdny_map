@@ -7,7 +7,38 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWJoMzI5IiwiYSI6ImNrNnUyejFycTA1bzAzbXBtb205c
 var initialCenterPoint = [-73.991780, 40.676]
 var initialZoom = 13
 
+// helper function to look up borough
 
+var BoroughLookup = (Borough) => {
+  switch (Borough) {
+    case Manhattan:
+      return {
+        color: '#f4f455',
+        description: 'Manhattan',
+      };
+    case Brooklyn:
+      return {
+        color: '#FF9900',
+        description: 'Brooklyn',
+      };
+    case Queens:
+      return{
+        color: '#ea6661',
+        description: 'Queens';
+      };
+    case Bronx:
+      return{
+        color: '#5CA2D1',
+        description: 'The Bronx',
+      };
+    case: Staten Island:
+      return{
+        color: '#8ece7c',
+        description: ' Staten Island'
+      };
+  }
+};
+      
 // set the default text for the feature-info div
 
 var defaultText = '<p>Move the mouse over the map to get more info on a Fire Station</p>'
