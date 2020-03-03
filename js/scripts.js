@@ -84,36 +84,63 @@ map.on('style.load', function() {
 
 }
 });
-});
 
 //code above works - don't mess with it
 // add an empty data source, which we will use to highlight the station the user is hovering over
-map.addSource('highlight_fdny_stations', {
-  type: 'geojson',
-  data: {
-    type: 'FeatureCollection',
-    features: []
-  }
-})
+map.addSource('highlight-feature', {
+    type: 'geojson',
+    data: {
+      type: 'FeatureCollection',
+      features: []
+    }
+  })
 
-// add a layer for the highlighted station
-map.addLayer({
-  id: 'highlight-circle',
-  type: 'circle',
-  source: 'highlight_fdny_stations',
-  paint: {
-    'circle-radius': 5,
-    'circle-opacity': 1,
-    'circle-color': 'black',
-  }
-});
+  // add a layer for the highlighted lot
+  map.addLayer({
+    id: 'highlight-circle',
+    type: 'circle',
+    source: 'highlight-feature',
+    paint: {
+      'line-width': 2,
+      'line-opacity': 0.9,
+      'line-color': 'white',
+    }
+  });
 
-map.on('mousemove', function (e) {
-   // query for the features under the mouse, but only in the lots layer
-   var features = map.queryRenderedFeatures(e.point, {
-       layers: ['highlight_fdny_stations'],
-   });
+  // listen for the mouse moving over the map and react when the cursor is over our data
 
-   // if the mouse pointer is over a feature on our layer of interest
-   // take the data for that feature and display it in the sidebar
+  map.on('mousemove', function (e) {
+    // query for the features under the mouse, but only in the lots layer
+    var features = map.queryRenderedFeatures(e.point, {
+        layers: ['point_fdny_stations'],
+    });
+
+    // if the mouse pointer is over a feature on our layer of interest
+    // take the data for that feature and display it in the sidebar
+    if (features.length > 0) {
+      map.getCanvas().style.cursor = 'pointer';  // make the cursor a pointer
+
+      var hoveredFeature = features[0]
+      var featureInfo = `
+        <h4>${hoveredFeature.properties.FacilityName}</h4>
+        <p><strong>Address:</strong> ${hoveredFeature.properties.FacilityAddress}</p>
+      `
+      $('#feature-info').html(featureInfo)
+
+      // set this lot's polygon feature as the data for the highlight source
+      map.getSource('highlight-feature').setData(hoveredFeature.geometry);
+    } else {
+      // if there is no feature under the mouse, reset things:
+      map.getCanvas().style.cursor = 'default'; // make the cursor default
+
+      // reset the highlight source to an empty featurecollection
+      map.getSource('highlight-feature').setData({
+        type: 'FeatureCollection',
+        features: []
+      });
+
+      // reset the default message
+      $('#feature-info').html(defaultText)
+    }
+  })
 })
